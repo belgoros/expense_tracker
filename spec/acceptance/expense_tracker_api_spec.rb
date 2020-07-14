@@ -2,6 +2,10 @@ require 'rack/test'
 require 'json'
 require_relative '../../app/api'
 
+# Note that we can nest RSpec contexts inside modules.
+# In our codebase, we’ll enclose both our app and our specs inside
+# the ExpenseTracker module so that we have easy access to all the
+# classes defined by our app
 module ExpenseTracker
   RSpec.describe 'Expense Tracker API' do
     include Rack::Test::Methods
