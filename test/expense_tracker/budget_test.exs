@@ -33,9 +33,22 @@ defmodule ExpenseTracker.BudgetTest do
       assert {:error, %Ecto.Changeset{}} = Budget.create_category(@invalid_attrs)
     end
 
+    test "create_category/1 with invalid budget returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} =
+               Budget.create_category(%{@invalid_attrs | monthly_budget: -1})
+
+      assert {:error, %Ecto.Changeset{}} =
+               Budget.create_category(%{@invalid_attrs | monthly_budget: 1_000_000})
+    end
+
     test "update_category/2 with valid data updates the category" do
       category = category_fixture()
-      update_attrs = %{name: "some updated name", description: "some updated description", monthly_budget: "456.7"}
+
+      update_attrs = %{
+        name: "some updated name",
+        description: "some updated description",
+        monthly_budget: "456.7"
+      }
 
       assert {:ok, %Category{} = category} = Budget.update_category(category, update_attrs)
       assert category.name == "some updated name"
