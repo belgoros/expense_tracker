@@ -8,6 +8,7 @@ defmodule ExpenseTracker.Budget.Category do
     field :name, :string
     field :description, :string
     field :monthly_budget, :decimal
+    has_many :expenses, ExpenseTracker.Budget.Expense
 
     timestamps(type: :utc_datetime)
   end
