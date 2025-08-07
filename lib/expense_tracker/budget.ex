@@ -6,7 +6,7 @@ defmodule ExpenseTracker.Budget do
   import Ecto.Query, warn: false
   alias ExpenseTracker.Repo
 
-  alias ExpenseTracker.Budget.Category
+  alias ExpenseTracker.Budget.{Category, Expense}
 
   @doc """
   Returns the list of categories.
@@ -100,5 +100,36 @@ defmodule ExpenseTracker.Budget do
   """
   def change_category(%Category{} = category, attrs \\ %{}) do
     Category.changeset(category, attrs)
+  end
+
+  @doc """
+  Creates an expense.
+
+  ## Examples
+
+      iex> create_expense(%{field: value})
+      {:ok, %Expense{}}
+
+      iex> create_expense(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_expense(attrs \\ %{}) do
+    %Expense{}
+    |> Expense.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Returns the list of expenses with categories preloaded.
+
+  ## Examples
+
+      iex> list_expenses()
+      [%Expense{}, ...]
+
+  """
+  def list_expenses do
+    Repo.all(Expense) |> Repo.preload(:category)
   end
 end

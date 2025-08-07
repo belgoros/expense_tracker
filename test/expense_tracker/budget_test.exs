@@ -3,13 +3,12 @@ defmodule ExpenseTracker.BudgetTest do
 
   alias ExpenseTracker.Budget
 
+  alias ExpenseTracker.Budget.{Category, Expense}
+
+  import ExpenseTracker.BudgetFixtures
+
   describe "categories" do
-    alias ExpenseTracker.Budget.Category
-
-    import ExpenseTracker.BudgetFixtures
-
     @invalid_attrs %{name: nil, description: nil, monthly_budget: nil}
-
     test "list_categories/0 returns all categories" do
       category = category_fixture()
       assert Budget.list_categories() == [category]
@@ -71,6 +70,34 @@ defmodule ExpenseTracker.BudgetTest do
     test "change_category/1 returns a category changeset" do
       category = category_fixture()
       assert %Ecto.Changeset{} = Budget.change_category(category)
+    end
+  end
+
+  describe "expenses" do
+    @invalid_attrs %{date: nil, description: nil, amount: nil}
+    test "list_expenses/0 returns all expenses" do
+      expense = expense_fixture()
+      assert Budget.list_expenses() == [expense]
+    end
+
+    test "create_expense/1 with valid data creates an expense" do
+      category = category_fixture()
+
+      valid_attrs = %{
+        date: ~D[2025-01-01],
+        description: "some description",
+        amount: 10.0,
+        category_id: category.id
+      }
+
+      assert {:ok, %Expense{} = expense} = Budget.create_expense(valid_attrs)
+      assert expense.date == ~D[2025-01-01]
+      assert expense.description == "some description"
+      assert expense.amount == Decimal.new("10.0")
+    end
+
+    test "create_expense/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Budget.create_expense(@invalid_attrs)
     end
   end
 end
