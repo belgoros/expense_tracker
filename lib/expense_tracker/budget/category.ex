@@ -18,6 +18,7 @@ defmodule ExpenseTracker.Budget.Category do
     category
     |> cast(attrs, [:name, :description, :monthly_budget])
     |> validate_required([:name, :description, :monthly_budget])
+    |> validate_length(:name, max: 100)
     |> validate_number(:monthly_budget,
       greater_than: 0,
       less_than_or_equal_to: @maximum_budget_amount
