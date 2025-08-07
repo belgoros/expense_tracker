@@ -20,7 +20,7 @@ defmodule ExpenseTracker.BudgetTest do
     end
 
     test "create_category/1 with valid data creates a category" do
-      valid_attrs = %{name: "some name", description: "some description", monthly_budget: "120.5"}
+      valid_attrs = %{name: "some name", description: "some description", monthly_budget: 120.5}
 
       assert {:ok, %Category{} = category} = Budget.create_category(valid_attrs)
       assert category.name == "some name"
@@ -46,7 +46,7 @@ defmodule ExpenseTracker.BudgetTest do
       update_attrs = %{
         name: "some updated name",
         description: "some updated description",
-        monthly_budget: "456.7"
+        monthly_budget: 456.7
       }
 
       assert {:ok, %Category{} = category} = Budget.update_category(category, update_attrs)
