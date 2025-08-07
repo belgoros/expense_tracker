@@ -17,5 +17,6 @@ defmodule ExpenseTracker.Budget.Expense do
     expense
     |> cast(attrs, [:description, :amount, :date, :notes, :category_id])
     |> validate_required([:description, :amount, :date, :category_id])
+    |> validate_length(:description, max: 500)
   end
 end
