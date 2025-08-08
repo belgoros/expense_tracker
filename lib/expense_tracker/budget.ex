@@ -132,4 +132,32 @@ defmodule ExpenseTracker.Budget do
   def list_expenses do
     Repo.all(Expense) |> Repo.preload(:category)
   end
+
+  @doc """
+  Returns the list of total spent vs budget for each category
+  ## Examples
+      iex> total_spent_by_category()
+      [
+        %{
+          category: value,
+          monthly_budget: value,
+          total_spent: value,
+          remaining_budget: value
+        },...
+      ]
+  """
+  def total_spent_by_category do
+    query =
+      from c in Category,
+        left_join: e in assoc(c, :expenses),
+        group_by: [c.id, c.name, c.monthly_budget],
+        select: %{
+          category: c.name,
+          monthly_budget: c.monthly_budget,
+          total_spent: coalesce(sum(e.amount), 0),
+          remaining_budget: c.monthly_budget - coalesce(sum(e.amount), 0)
+        }
+
+    Repo.all(query)
+  end
 end
