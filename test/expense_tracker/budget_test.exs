@@ -100,4 +100,38 @@ defmodule ExpenseTracker.BudgetTest do
       assert {:error, %Ecto.Changeset{}} = Budget.create_expense(@invalid_attrs)
     end
   end
+
+  describe "total spent vs. budget for each category" do
+    test "total_spent_by_category/0 displays zero value as total_spent if category has no expenses " do
+      category = category_fixture(%{monthly_budget: 100})
+
+      %{
+        category: _category,
+        monthly_budget: monthly_budget,
+        total_spent: total_spent,
+        remaining_budget: remaining_budget
+      } = Budget.total_spent_by_category() |> hd()
+
+      assert Decimal.equal?(category.monthly_budget, monthly_budget)
+      assert Decimal.equal?(remaining_budget, category.monthly_budget)
+      assert Decimal.equal?(total_spent, Decimal.new("0"))
+    end
+
+    test "total_spent_by_category/0 displays correct values if expenses present" do
+      category = category_fixture(%{monthly_budget: 100})
+      expense_fixture(%{category: category, amount: 20})
+      expense_fixture(%{category: category, amount: 50})
+
+      %{
+        category: _category,
+        monthly_budget: monthly_budget,
+        total_spent: total_spent,
+        remaining_budget: remaining_budget
+      } = Budget.total_spent_by_category() |> hd()
+
+      assert Decimal.equal?(category.monthly_budget, monthly_budget)
+      assert Decimal.equal?(remaining_budget, Decimal.new("30"))
+      assert Decimal.equal?(total_spent, Decimal.new("70"))
+    end
+  end
 end
