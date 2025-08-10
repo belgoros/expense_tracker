@@ -1,28 +1,78 @@
-<.header>
-  Category {@category.id}
-  <:subtitle>This is a category record from your database.</:subtitle>
-  <:actions>
-    <.link patch={~p"/categories/#{@category}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit category</.button>
-    </.link>
-  </:actions>
-</.header>
+<div class="flex flex-col items-center justify-center p-6 bg-gray-50">
+  <div class="w-full max-w-2xl p-6 space-y-4 bg-white shadow-lg rounded-2xl">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">{@category.name}</h1>
+        <p :if={@category.description} class="text-gray-600">
+          Description: {@category.description}
+        </p>
+        <p>
+          Monthly budget:
+          <.currency amount={@category.monthly_budget} class="text-2xl font-bold" />
+        </p>
+      </div>
+    </div>
 
-<.list>
-  <:item title="Name">{@category.name}</:item>
-  <:item title="Description">{@category.description}</:item>
-  <:item title="Monthly budget">{@category.monthly_budget}</:item>
-</.list>
+    <div class="py-6 text-center">
+      <p :if={@category.expenses == []} class="mb-4 text-gray-600">😢 Nothing spent yet...</p>
+      <.link navigate={~p"/categories/#{@category}/new-expense"} class="btn-light">
+        <.icon
+          name="hero-briefcase"
+          class="w-4 h-4 text-indigo-600 transition hover:text-indigo-400/75"
+        /> Add Expense
+      </.link>
+    </div>
 
-<.back navigate={~p"/categories"}>Back to categories</.back>
+    <%= if Enum.any?(@category.expenses) do %>
+      <div>
+        <h2 class="mb-2 text-lg font-semibold text-gray-800">Latest expenses</h2>
+        <ul class="space-y-2">
+          <li
+            :for={expense <- @category.expenses}
+            class="p-4 transition bg-gray-100 rounded-xl hover:bg-gray-200"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <.icon name="hero-briefcase" class="w-6 h-6 text-indigo-600" />
+                <p class="text-sm text-gray-600">{expense.date}</p>
+              </div>
+              <button
+                type="button"
+                phx-click="delete_expense"
+                phx-value-id={expense.id}
+                data-confirm="Are you sure you want to delete the expense?"
+                class="text-red-600 hover:text-red-800"
+              >
+                <.icon name="hero-trash" class="w-4 h-4" />
+              </button>
+            </div>
+            <p class="font-medium text-gray-900">{expense.description}</p>
+            <p class="text-sm text-gray-600">
+              <.currency
+                amount={Decimal.negate(expense.amount)}
+                class="text-gray-400"
+                negative_class="text-gray-400"
+              />
+            </p>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+    <.back navigate={~p"/categories"}>Back to categories</.back>
+  </div>
+</div>
 
-<.modal :if={@live_action == :edit} id="category-modal" show on_cancel={JS.patch(~p"/categories/#{@category}")}>
+<.modal
+  :if={@live_action in [:new_expense, :edit_expense]}
+  id="expense-dialog"
+  on_cancel={JS.navigate(~p"/categories/#{@category}", replace: true)}
+  show
+>
   <.live_component
-    module={ExpenseTrackerWeb.CategoryLive.FormComponent}
-    id={@category.id}
-    title={@page_title}
-    action={@live_action}
+    module={ExpenseTrackerWeb.ExpenseLive.ExpenseDialog}
+    id="expense"
     category={@category}
-    patch={~p"/categories/#{@category}"}
+    expense={assigns[:expense] || default_expense()}
+    action={@live_action}
   />
 </.modal>

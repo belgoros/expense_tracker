@@ -1,0 +1,42 @@
+<div>
+  <div class="p-6 pb-0">
+    <h2 :if={@action == :new_expense} class="text-2xl font-bold text-gray-900">
+      New Expense
+    </h2>
+    <h2 :if={@action == :edit_expense} class="text-2xl font-bold text-gray-900">
+      Edit Expense
+    </h2>
+  </div>
+
+  <.form
+    for={@form}
+    class="p-6 space-y-6"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="space-y-4">
+      <.input field={@form[:date]} type="date" label="Date" required />
+      <.input field={@form[:description]} type="text" label="Description" />
+      <.input
+        field={@form[:amount]}
+        label="Amount"
+        type="number"
+        step="0.01"
+        placeholder="$123.45"
+        autofocus
+        required
+      />
+      <.input field={@form[:notes]} type="text" label="Notes" />
+    </div>
+
+    <div class="pt-4">
+      <button
+        type="submit"
+        class="w-full px-4 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Save Expense
+      </button>
+    </div>
+  </.form>
+</div>
