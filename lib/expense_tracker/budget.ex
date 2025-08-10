@@ -37,6 +37,8 @@ defmodule ExpenseTracker.Budget do
   """
   def get_category!(id), do: Repo.get!(Category, id)
 
+  def get_category_with_expenses!(id), do: Repo.get!(Category, id) |> Repo.preload(:expenses)
+
   @doc """
   Creates a category.
 
@@ -121,6 +123,38 @@ defmodule ExpenseTracker.Budget do
   end
 
   @doc """
+  Updates an expense.
+
+  ## Examples
+
+      iex> update_expense(expense, %{field: new_value})
+      {:ok, %Expense{}}
+
+      iex> update_expense(expense, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_expense(%Expense{} = expense, attrs) do
+    expense
+    |> Expense.changeset(attrs)
+    |> Repo.update()
+    |> preload_category()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking expense changes.
+
+  ## Examples
+
+      iex> change_expense(expense)
+      %Ecto.Changeset{data: %Expense{}}
+
+  """
+  def change_expense(%Expense{} = expense, attrs \\ %{}) do
+    Expense.changeset(expense, attrs)
+  end
+
+  @doc """
   Returns the list of expenses with categories preloaded.
 
   ## Examples
@@ -160,4 +194,23 @@ defmodule ExpenseTracker.Budget do
 
     Repo.all(query)
   end
+
+  @doc """
+  Deletes an expense.
+
+  ## Examples
+
+      iex> delete_expense(expense)
+      {:ok, %Expense{}}
+
+      iex> delete_expense(expense)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_expense(%Expense{} = expense) do
+    Repo.delete(expense)
+  end
+
+  defp preload_category({:ok, expense}), do: {:ok, Repo.preload(expense, :category)}
+  defp preload_category(error), do: error
 end

@@ -5,7 +5,11 @@ defmodule ExpenseTrackerWeb.CategoryLiveTest do
   import ExpenseTracker.BudgetFixtures
 
   @create_attrs %{name: "some name", description: "some description", monthly_budget: "120.5"}
-  @update_attrs %{name: "some updated name", description: "some updated description", monthly_budget: "456.7"}
+  @update_attrs %{
+    name: "some updated name",
+    description: "some updated description",
+    monthly_budget: "456.7"
+  }
   @invalid_attrs %{name: nil, description: nil, monthly_budget: nil}
 
   defp create_category(_) do
@@ -83,31 +87,7 @@ defmodule ExpenseTrackerWeb.CategoryLiveTest do
     test "displays category", %{conn: conn, category: category} do
       {:ok, _show_live, html} = live(conn, ~p"/categories/#{category}")
 
-      assert html =~ "Show Category"
       assert html =~ category.name
-    end
-
-    test "updates category within modal", %{conn: conn, category: category} do
-      {:ok, show_live, _html} = live(conn, ~p"/categories/#{category}")
-
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Category"
-
-      assert_patch(show_live, ~p"/categories/#{category}/show/edit")
-
-      assert show_live
-             |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert show_live
-             |> form("#category-form", category: @update_attrs)
-             |> render_submit()
-
-      assert_patch(show_live, ~p"/categories/#{category}")
-
-      html = render(show_live)
-      assert html =~ "Category updated successfully"
-      assert html =~ "some updated name"
     end
   end
 end

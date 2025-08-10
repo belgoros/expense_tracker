@@ -22,7 +22,9 @@ defmodule ExpenseTrackerWeb.Router do
     live "/categories/new", CategoryLive.Index, :new
     live "/categories/:id/edit", CategoryLive.Index, :edit
 
-    live "/categories/:id", CategoryLive.Show, :show
+    live "/categories/:category_id", CategoryLive.Show, :show
+    live "/categories/:category_id/new-expense", CategoryLive.Show, :new_expense
+    live "/categories/:category_id/expenses/:expense_id/edit", CategoryLive.Show, :edit_expense
     live "/categories/:id/show/edit", CategoryLive.Show, :edit
   end
 
