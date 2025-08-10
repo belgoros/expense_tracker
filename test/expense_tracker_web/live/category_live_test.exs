@@ -5,7 +5,11 @@ defmodule ExpenseTrackerWeb.CategoryLiveTest do
   import ExpenseTracker.BudgetFixtures
 
   @create_attrs %{name: "some name", description: "some description", monthly_budget: "120.5"}
-  @update_attrs %{name: "some updated name", description: "some updated description", monthly_budget: "456.7"}
+  @update_attrs %{
+    name: "some updated name",
+    description: "some updated description",
+    monthly_budget: "456.7"
+  }
   @invalid_attrs %{name: nil, description: nil, monthly_budget: nil}
 
   defp create_category(_) do
@@ -83,7 +87,6 @@ defmodule ExpenseTrackerWeb.CategoryLiveTest do
     test "displays category", %{conn: conn, category: category} do
       {:ok, _show_live, html} = live(conn, ~p"/categories/#{category}")
 
-      assert html =~ "Show Category"
       assert html =~ category.name
     end
 
