@@ -134,4 +134,18 @@ defmodule ExpenseTracker.BudgetTest do
       assert Decimal.equal?(total_spent, Decimal.new("70"))
     end
   end
+
+  describe "get_category_with_expenses/1" do
+    test "it returns a category with its expenses limited to the default value" do
+      category = category_fixture(%{monthly_budget: 200})
+
+      for _ <- 1..10 do
+        expense_fixture(%{category: category, amount: 10})
+      end
+
+      category_with_expenses = Budget.get_category_with_expenses!(category.id)
+
+      assert Enum.count(category_with_expenses.expenses) == 5
+    end
+  end
 end
