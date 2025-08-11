@@ -58,7 +58,8 @@ defmodule ExpenseTracker.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:faker, "~> 0.18.0", only: [:dev, :test]}
+      {:faker, "~> 0.18.0", only: [:dev, :test]},
+      {:typed_ecto_schema, "~> 0.4.1"}
     ]
   end
 
