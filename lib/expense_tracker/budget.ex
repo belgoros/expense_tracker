@@ -8,6 +8,11 @@ defmodule ExpenseTracker.Budget do
 
   alias ExpenseTracker.Budget.{Category, Expense}
 
+  @expenses_per_page_limit Application.compile_env(:expense_tracker, [
+                             __MODULE__,
+                             :expenses_per_page
+                           ])
+
   @doc """
   Returns the list of categories.
 
@@ -37,7 +42,16 @@ defmodule ExpenseTracker.Budget do
   """
   def get_category!(id), do: Repo.get!(Category, id)
 
-  def get_category_with_expenses!(id), do: Repo.get!(Category, id) |> Repo.preload(:expenses)
+  def get_category_with_expenses!(id) do
+    Repo.get!(Category, id)
+    |> Repo.preload(expenses: limited_expenses_query(@expenses_per_page_limit))
+  end
+
+  def limited_expenses_query(limit) do
+    from e in Expense,
+      limit: ^limit,
+      order_by: [desc: e.inserted_at]
+  end
 
   @doc """
   Creates a category.
