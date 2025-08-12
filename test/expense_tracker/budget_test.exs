@@ -86,7 +86,7 @@ defmodule ExpenseTracker.BudgetTest do
       valid_attrs = %{
         date: ~D[2025-01-01],
         description: "some description",
-        amount: 10.0,
+        amount: "10.0",
         category_id: category.id
       }
 
@@ -98,6 +98,23 @@ defmodule ExpenseTracker.BudgetTest do
 
     test "create_expense/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Budget.create_expense(@invalid_attrs)
+    end
+
+    test "create_expense/1 with amount which exceeds the category monthly budget" do
+      category = category_fixture(%{monthly_budget: 50})
+
+      expense_attrs = %{
+        date: ~D[2025-01-01],
+        description: "some description",
+        amount: "60.0",
+        category_id: category.id
+      }
+
+      assert {:error, changeset} = Budget.create_expense(expense_attrs)
+
+      # Option 1: Using traverse_errors
+      errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, _opts} -> msg end)
+      assert errors[:amount] == ["would exceed the category's monthly budget"]
     end
   end
 

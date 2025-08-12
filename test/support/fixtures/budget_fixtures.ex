@@ -12,8 +12,8 @@ defmodule ExpenseTracker.BudgetFixtures do
       attrs
       |> Enum.into(%{
         description: Faker.Lorem.sentence(),
-        monthly_budget: 120.5,
-        name: Faker.Food.dish()
+        monthly_budget: "120.5",
+        name: Faker.Commerce.En.department()
       })
       |> ExpenseTracker.Budget.create_category()
 
@@ -30,8 +30,8 @@ defmodule ExpenseTracker.BudgetFixtures do
       attrs
       |> Enum.into(%{
         date: ~D[2025-04-13],
-        description: Faker.Lorem.word(),
-        amount: 120.5,
+        description: Faker.Commerce.En.product_name(),
+        amount: "120.5",
         notes: Faker.Lorem.sentence(),
         category_id: category.id
       })
