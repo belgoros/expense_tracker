@@ -10,6 +10,54 @@
           Monthly budget:
           <.currency amount={@category.monthly_budget} class="text-2xl font-bold" />
         </p>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-sm font-medium text-indigo-700">Spent</span>
+            <span class="text-sm font-medium text-indigo-700">
+              {@spending_percent}%
+            </span>
+          </div>
+          <canvas id="spendingProgress" height="70"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js">
+        </script>
+        <script>
+          window.addEventListener("phx:page-loading-stop", function() {
+            const percent = <%= @spending_percent %>;
+            const ctx = document.getElementById('spendingProgress').getContext('2d');
+            if (window.spendingChart) window.spendingChart.destroy();
+            window.spendingChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['Spent'],
+                datasets: [{
+                  label: 'Spending',
+                  data: [percent],
+                  backgroundColor: percent < 100 ? 'rgba(99, 102, 241, 0.7)' : 'rgba(239, 68, 68, 0.7)',
+                  borderRadius: 8,
+                  barPercentage: 0.7,
+                  categoryPercentage: 0.7,
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                scales: {
+                  x: {
+                    min: 0,
+                    max: 100,
+                    ticks: { callback: value => value + '%' }
+                  }
+                },
+                plugins: {
+                  legend: { display: false },
+                  tooltip: { enabled: false }
+                }
+              }
+            });
+          });
+        </script>
       </div>
     </div>
 
@@ -17,7 +65,7 @@
       <p :if={@category.expenses == []} class="mb-4 text-gray-600">😢 Nothing spent yet...</p>
       <.link navigate={~p"/categories/#{@category}/new-expense"} class="btn-light">
         <.icon
-          name="hero-briefcase"
+          name="hero-plus"
           class="w-4 h-4 text-indigo-600 transition hover:text-indigo-400/75"
         /> Add Expense
       </.link>
@@ -33,7 +81,7 @@
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
-                <.icon name="hero-briefcase" class="w-6 h-6 text-indigo-600" />
+                <.icon name="hero-banknotes" class="w-6 h-6 text-indigo-600" />
                 <p class="text-sm text-gray-600">{expense.date}</p>
               </div>
               <button
