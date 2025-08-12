@@ -103,35 +103,48 @@ defmodule ExpenseTracker.BudgetTest do
 
   describe "total spent vs. budget for each category" do
     test "total_spent_by_category/0 displays zero value as total_spent if category has no expenses " do
-      category = category_fixture(%{monthly_budget: 100})
+      category = category_fixture(%{monthly_budget: 100, name: "Food"})
+      category_id = category.id
+      monthly_budget = category.monthly_budget
 
-      %{
-        category: _category,
-        monthly_budget: monthly_budget,
-        total_spent: total_spent,
-        remaining_budget: remaining_budget
-      } = Budget.total_spent_by_category() |> hd()
+      results = Budget.total_spent_by_category()
 
-      assert Decimal.equal?(category.monthly_budget, monthly_budget)
-      assert Decimal.equal?(remaining_budget, category.monthly_budget)
-      assert Decimal.equal?(total_spent, Decimal.new("0"))
+      assert [
+               %{
+                 id: ^category_id,
+                 name: "Food",
+                 monthly_budget: ^monthly_budget,
+                 total_spent: total_spent,
+                 remaining_budget: remaining_budget
+               }
+             ] = results
+
+      assert total_spent == Decimal.new("0")
+      assert remaining_budget == Decimal.sub(category.monthly_budget, total_spent)
     end
 
-    test "total_spent_by_category/0 displays correct values if expenses present" do
-      category = category_fixture(%{monthly_budget: 100})
+    test "total_spent_by_category/0 displays correct values if expenses are present" do
+      category = category_fixture(%{monthly_budget: 100, name: "Food"})
+      category_id = category.id
+      monthly_budget = category.monthly_budget
+
       expense_fixture(%{category: category, amount: 20})
       expense_fixture(%{category: category, amount: 50})
 
-      %{
-        category: _category,
-        monthly_budget: monthly_budget,
-        total_spent: total_spent,
-        remaining_budget: remaining_budget
-      } = Budget.total_spent_by_category() |> hd()
+      results = Budget.total_spent_by_category()
 
-      assert Decimal.equal?(category.monthly_budget, monthly_budget)
-      assert Decimal.equal?(remaining_budget, Decimal.new("30"))
-      assert Decimal.equal?(total_spent, Decimal.new("70"))
+      assert [
+               %{
+                 id: ^category_id,
+                 name: "Food",
+                 monthly_budget: ^monthly_budget,
+                 total_spent: total_spent,
+                 remaining_budget: remaining_budget
+               }
+             ] = results
+
+      assert total_spent == Decimal.new("70")
+      assert remaining_budget == Decimal.sub(category.monthly_budget, total_spent)
     end
   end
 

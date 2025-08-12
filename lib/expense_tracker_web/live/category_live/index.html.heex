@@ -10,13 +10,23 @@
 <.table
   id="categories"
   rows={@streams.categories}
-  row_click={fn {_id, category} -> JS.navigate(~p"/categories/#{category}") end}
+  row_click={fn {_id, category} -> JS.navigate(~p"/categories/#{category.id}") end}
 >
   <:col :let={{_id, category}} label="Name">{category.name}</:col>
   <:col :let={{_id, category}} label="Description">{category.description}</:col>
-  <:col :let={{_id, category}} label="Monthly budget">{category.monthly_budget}</:col>
+
+  <:col :let={{_id, category}} label="Monthly budget">
+    <.currency amount={category.monthly_budget} />
+  </:col>
+  <:col :let={{_id, category}} label="Spent">
+    <.currency amount={category.total_spent} />
+  </:col>
+  <:col :let={{_id, category}} label="Remaining">
+    <.currency amount={category.remaining_budget} />
+  </:col>
+
   <:action :let={{_id, category}}>
-    <.link patch={~p"/categories/#{category}/edit"}>Edit</.link>
+    <.link patch={~p"/categories/#{category.id}/edit"}>Edit</.link>
   </:action>
   <:action :let={{id, category}}>
     <.link
