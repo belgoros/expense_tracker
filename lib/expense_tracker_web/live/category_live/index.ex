@@ -6,7 +6,7 @@ defmodule ExpenseTrackerWeb.CategoryLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :categories, Budget.list_categories())}
+    {:ok, stream(socket, :categories, Budget.total_spent_by_category())}
   end
 
   @impl true
@@ -34,6 +34,11 @@ defmodule ExpenseTrackerWeb.CategoryLive.Index do
 
   @impl true
   def handle_info({ExpenseTrackerWeb.CategoryLive.FormComponent, {:saved, category}}, socket) do
+    category =
+      category
+      |> Map.put(:total_spent, Decimal.new(0))
+      |> Map.put(:remaining_budget, category.monthly_budget)
+
     {:noreply, stream_insert(socket, :categories, category)}
   end
 
@@ -42,6 +47,7 @@ defmodule ExpenseTrackerWeb.CategoryLive.Index do
     category = Budget.get_category!(id)
     {:ok, _} = Budget.delete_category(category)
 
-    {:noreply, stream_delete(socket, :categories, category)}
+    # Pass a map with just the id key to remove the item from the stream
+    {:noreply, stream_delete(socket, :categories, %{id: id})}
   end
 end
