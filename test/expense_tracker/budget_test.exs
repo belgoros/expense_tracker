@@ -3,7 +3,7 @@ defmodule ExpenseTracker.BudgetTest do
 
   alias ExpenseTracker.Budget
 
-  alias ExpenseTracker.Budget.{Category, Expense, Balance}
+  alias ExpenseTracker.Budget.{Category, Expense}
 
   import ExpenseTracker.BudgetFixtures
 
@@ -110,9 +110,9 @@ defmodule ExpenseTracker.BudgetTest do
       results = Budget.total_spent_by_category()
 
       assert [
-               %Balance{
-                 category_id: ^category_id,
-                 category_name: "Food",
+               %{
+                 id: ^category_id,
+                 name: "Food",
                  monthly_budget: ^monthly_budget,
                  total_spent: total_spent,
                  remaining_budget: remaining_budget
@@ -134,9 +134,9 @@ defmodule ExpenseTracker.BudgetTest do
       results = Budget.total_spent_by_category()
 
       assert [
-               %Balance{
-                 category_id: ^category_id,
-                 category_name: "Food",
+               %{
+                 id: ^category_id,
+                 name: "Food",
                  monthly_budget: ^monthly_budget,
                  total_spent: total_spent,
                  remaining_budget: remaining_budget
