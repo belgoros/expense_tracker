@@ -5,7 +5,7 @@ defmodule ExpenseTracker.Budget do
 
   import Ecto.Query
   alias ExpenseTracker.Repo
-  alias ExpenseTracker.Budget.{Balance, Category, Expense}
+  alias ExpenseTracker.Budget.{Category, Expense}
 
   @expenses_per_page_limit Application.compile_env(:expense_tracker, [
                              __MODULE__,
@@ -185,23 +185,23 @@ defmodule ExpenseTracker.Budget do
   ## Examples
       iex> total_spent_by_category()
       [
-        %Balance{
-          category_id: value
-          category_name: value,
+        %{
+          id: value
+          name: value,
           monthly_budget: value,
           total_spent: value,
           remaining_budget: value
         },...
       ]
   """
-  @spec total_spent_by_category() :: [Balance.t()]
   def total_spent_by_category do
     from(c in Category,
       left_join: e in assoc(c, :expenses),
       group_by: [c.id, c.name, c.monthly_budget],
-      select: %Balance{
-        category_id: c.id,
-        category_name: c.name,
+      select: %{
+        id: c.id,
+        name: c.name,
+        description: c.description,
         monthly_budget: c.monthly_budget,
         total_spent: coalesce(sum(e.amount), 0),
         remaining_budget: c.monthly_budget - coalesce(sum(e.amount), 0)
