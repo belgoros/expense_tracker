@@ -13,7 +13,7 @@ defmodule ExpenseTrackerWeb.CategoryLiveTest do
   @invalid_attrs %{name: nil, description: nil, monthly_budget: nil}
 
   defp create_category(_) do
-    category = category_fixture()
+    category = category_fixture(name: "Food")
     %{category: category}
   end
 

@@ -130,9 +130,51 @@ defmodule ExpenseTracker.Budget do
 
   """
   def create_expense(attrs \\ %{}) do
-    %Expense{}
-    |> Expense.changeset(attrs)
-    |> Repo.insert()
+    category_id = attrs["category_id"] || attrs[:category_id]
+    amount = attrs["amount"] || attrs[:amount]
+
+    # Handle missing category_id
+    if is_nil(category_id) do
+      changeset =
+        Expense.changeset(%Expense{}, attrs)
+        |> Ecto.Changeset.add_error(:category_id, "can't be blank")
+
+      {:error, changeset}
+    else
+      category = Repo.get(Category, category_id)
+
+      # Handle non-existent category
+      if is_nil(category) do
+        changeset =
+          Expense.changeset(%Expense{}, attrs)
+          |> Ecto.Changeset.add_error(:category_id, "does not exist")
+
+        {:error, changeset}
+      else
+        # Sum existing expenses for this category
+        total_spent =
+          from(e in Expense,
+            where: e.category_id == ^category_id,
+            select: coalesce(sum(e.amount), 0)
+          )
+          |> Repo.one()
+
+        # Convert all to Decimal for safe arithmetic
+        new_total = Decimal.add(total_spent, Decimal.new(amount))
+
+        if Decimal.compare(new_total, category.monthly_budget) == :gt do
+          changeset =
+            Expense.changeset(%Expense{}, attrs)
+            |> Ecto.Changeset.add_error(:amount, "would exceed the category's monthly budget")
+
+          {:error, changeset}
+        else
+          %Expense{}
+          |> Expense.changeset(attrs)
+          |> Repo.insert()
+        end
+      end
+    end
   end
 
   @doc """
