@@ -11,7 +11,6 @@
 # and so on) as they will fail if something goes wrong.
 defmodule Seeder do
   alias ExpenseTracker.Repo
-  alias ExpenseTracker.Budget
   alias ExpenseTracker.Budget.{Category, Expense}
 
   def run() do
