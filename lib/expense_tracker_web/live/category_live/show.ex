@@ -9,10 +9,13 @@ defmodule ExpenseTrackerWeb.CategoryLive.Show do
     category = Budget.get_category_with_expenses!(id)
 
     if category do
+      percent = spending_percentage(category)
+
       {:ok,
        assign(socket,
          category: category,
-         page_title: category.name
+         page_title: category.name,
+         spending_percent: percent
        )
        |> apply_action(params)}
     else
@@ -32,6 +35,25 @@ defmodule ExpenseTrackerWeb.CategoryLive.Show do
       |> redirect(to: ~p"/categories")
 
     {:ok, socket}
+  end
+
+  defp spending_percentage(category) do
+    spent =
+      category.expenses
+      |> Enum.map(& &1.amount)
+      |> Enum.reduce(Decimal.new(0), &Decimal.add/2)
+
+    if category.monthly_budget && Decimal.compare(category.monthly_budget, 0) == :gt do
+      percent =
+        spent
+        |> Decimal.div(category.monthly_budget)
+        |> Decimal.mult(Decimal.new(100))
+        |> Decimal.to_float()
+
+      Float.round(percent, 1)
+    else
+      0.0
+    end
   end
 
   def apply_action(%{assigns: %{live_action: :edit_expense}} = socket, %{
