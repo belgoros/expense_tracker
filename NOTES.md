@@ -18,7 +18,7 @@ In this case a new migration should be added to change the existing decimal type
 ### Display percentage progress bar
 
 [Chart.js](https://www.chartjs.org) library is used to display spent percentage on the Category page.
-As this library is loaded via CDN directly on the Category page, sometimes there is small delay to display the chart. This issue has to be investigated to find a better way to manage it.
+See teh declared `Hooks` for more settings details.
 
 To limit the number of expenses to be displayed on the Category page, its default value is set in the `config.exs`. file as `expenses_per_page` entry.
 
